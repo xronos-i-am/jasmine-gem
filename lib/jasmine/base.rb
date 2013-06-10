@@ -56,7 +56,7 @@ module Jasmine
     return default_file_path if template == 'default'
 
     file_path = File.join(config.spec_dir, "#{template}.html.erb")
-    return file_path unless File.exists?(file_path)
+    return file_path if File.exists?(file_path)
 
     default_file_path
   end  

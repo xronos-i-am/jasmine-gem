@@ -28,7 +28,7 @@ module Jasmine
     @config.add_rack_path(src_path, lambda {
       Rack::Cascade.new([
         Rack::URLMap.new('/' => Rack::File.new(config.src_dir)),
-        Rack::Jasmine::Runner.new(Jasmine::Page.new(config))
+        Rack::Jasmine::Runner.new(config)
       ])
     })
 
