@@ -43,12 +43,21 @@ module Jasmine
     File.expand_path(File.join(File.dirname(__FILE__), "run_specs.rb"))
   end
 
-  def self.runner_template
-    File.read(File.join(File.dirname(__FILE__), "run.html.erb"))
+  def self.runner_template(config, template)
+    File.read(self.template_path(config, template))
   end
 
   def self.root(*paths)
     File.expand_path(File.join(File.dirname(__FILE__), *paths))
   end
 
+  def self.template_path(config, template)
+    default_file_path = File.join(File.dirname(__FILE__), "run.html.erb")
+    return default_file_path if template == 'default'
+
+    file_path = File.join(config.spec_dir, "#{template}.html.erb")
+    return file_path unless File.exists?(file_path)
+
+    default_file_path
+  end  
 end

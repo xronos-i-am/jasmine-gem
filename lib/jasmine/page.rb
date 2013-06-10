@@ -4,8 +4,8 @@ module Jasmine
       @context = context
     end
 
-    def render
-      ERB.new(::Jasmine.runner_template).result(@context.instance_eval { binding })
+    def render(template)
+      ERB.new(::Jasmine.runner_template(@context, template)).result(@context.instance_eval { binding })
     end
   end
 end

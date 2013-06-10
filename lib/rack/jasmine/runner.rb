@@ -2,17 +2,18 @@ module Rack
   module Jasmine
 
     class Runner
-      def initialize(page)
-        @page = page
+      def initialize(config)
+        @config = config
       end
 
       def call(env)
         @path = env["PATH_INFO"]
-        return not_found if @path != "/"
+        current_template = find_template( @path )
+        return not_found if current_template.nil?
         [
           200,
           { 'Content-Type' => 'text/html'},
-          [@page.render]
+          [::Jasmine::Page.new(@config).render(current_template)]
         ]
       end
 
@@ -20,6 +21,11 @@ module Rack
         [404, {"Content-Type" => "text/plain",
                "X-Cascade" => "pass"},
                ["File not found: #{@path}\n"]]
+      end
+
+      def find_template( path )
+        return 'default' if path == '/'
+        return $1 if path =~ /^\/page\/(.*)/
       end
     end
 
