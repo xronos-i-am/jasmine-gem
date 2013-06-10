@@ -35,9 +35,12 @@ module Jasmine
     @config.add_rack_app(Rack::Head)
     @config.add_rack_app(Rack::Jasmine::CacheControl)
 
-    if Jasmine::Dependencies.use_asset_pipeline?
+    if Jasmine::Dependencies.rails_3_asset_pipeline?
       @config.add_path_mapper(lambda { |config|
-        asset_expander = Jasmine::AssetExpander.new(Jasmine::AssetBundle.factory)
+        asset_expander = Jasmine::AssetExpander.new(
+          Jasmine::AssetPipelineUtility.method(:bundled_asset_factory),
+          Jasmine::AssetPipelineUtility.method(:asset_path_for)
+        )
         Jasmine::AssetPipelineMapper.new(config, asset_expander.method(:expand))
       })
       @config.add_rack_path('/assets', lambda {
@@ -45,13 +48,8 @@ module Jasmine
         # triggers run_load_hooks on action_view which, in turn, causes sprockets/railtie to load the Sprockets asset
         # helpers.  Alternatively, you can include the helpers yourself without loading action_view/base:
         Rails.application.assets.context_class.instance_eval do
-          if Jasmine::Dependencies.rails3?
-            include ::Sprockets::Helpers::IsolatedHelper
-            include ::Sprockets::Helpers::RailsHelper
-          end
-          if Jasmine::Dependencies.rails4?
-            include ::Sprockets::Rails::Helper
-          end
+          include ::Sprockets::Helpers::IsolatedHelper
+          include ::Sprockets::Helpers::RailsHelper
         end
         Rails.application.assets
       })
